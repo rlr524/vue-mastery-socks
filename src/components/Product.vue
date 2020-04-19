@@ -22,11 +22,16 @@
           :style="{ backgroundColor: variant.variantColor }"
           @mouseover="updateProduct(index)"
         ></div>
-        <span>Available in sizes:</span>
-        <ul>
+        <p>
+          Available in sizes:
+          <span v-for="(size, index) in sizes" :key="index">
+            {{ size }}
+          </span>
+        </p>
+        <!-- <ul>
           <li v-for="(size, index) in sizes" :key="index">{{ size }}</li>
-        </ul>
-        <div>
+        </ul> -->
+        <div class="cart-buttons">
           <button
             @click="addToCart"
             :disabled="!inStock"
@@ -38,6 +43,19 @@
             Remove from Cart
           </button>
         </div>
+        <div>
+          <h2>Reviews</h2>
+          <p v-if="!reviews.length">There are no reviews yet.</p>
+          <ul>
+            <li v-for="(review, index) in reviews" :key="index">
+              <p>{{ review.name }}</p>
+              <p>Rating: {{ review.rating }}</p>
+              <p>{{ review.review }}</p>
+              <p>Recommended? {{ review.recommend }}</p>
+            </li>
+          </ul>
+        </div>
+        <ProductReview @review-submitted="addReview" />
       </div>
     </div>
   </div>
@@ -45,10 +63,12 @@
 
 <script>
 import ProductDetails from "./ProductDetails";
+import ProductReview from "./ProductReview";
 export default {
   name: "Product",
   components: {
     ProductDetails,
+    ProductReview,
   },
   props: {
     premium: {
@@ -83,6 +103,7 @@ export default {
       ],
       sizes: ["s", "m", "l", "xl", "xxl"],
       details: ["80% Cotton", "20% Polyester", "Gender-neutral"],
+      reviews: [],
     };
   },
   methods: {
@@ -98,6 +119,9 @@ export default {
     updateProduct: function(index) {
       this.selectedVariant = index;
       console.log(index);
+    },
+    addReview: function(productReview) {
+      this.reviews.push(productReview);
     },
   },
   computed: {
@@ -152,10 +176,18 @@ h1 {
   margin-bottom: 2px;
 }
 
+.size-text {
+  margin: 10px 0;
+}
+
 .color-box {
   width: 40px;
   height: 40px;
   margin-top: 5px;
+}
+
+.cart-buttons {
+  display: flex;
 }
 
 button {
@@ -166,6 +198,7 @@ button {
   height: 40px;
   width: 100px;
   font-size: 14px;
+  margin: 4px;
 }
 
 .disabledButton {
@@ -174,24 +207,6 @@ button {
 
 .outStockLabel {
   text-decoration: line-through;
-}
-
-.review-form {
-  width: 400px;
-  padding: 20px;
-  margin: 40px;
-  border: 1px solid #d8d8d8;
-}
-
-input {
-  width: 100%;
-  height: 25px;
-  margin-bottom: 20px;
-}
-
-textarea {
-  width: 100%;
-  height: 60px;
 }
 
 .tab {
