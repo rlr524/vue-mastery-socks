@@ -1,108 +1,51 @@
 <template>
   <div id="app">
-    <div class="nav-bar"></div>
-    <div class="product">
-      <div class="product-image">
-        <img :src="image" alt="Socks" />
-      </div>
-      <div class="product-info">
-        <h1>{{ productTitle }}</h1>
-        <a :href="vendor" target="_blank">Get from Nordstrom</a>
-        <p v-if="inStock">In Stock</p>
-        <p v-else :class="{ outStockLabel: !inStock }">Out of Stock</p>
-        <p v-if="onSale">On Sale!</p>
-        <!-- use v-for to loop through the array -->
-        <ul>
-          <li v-for="(detail, index) in details" :key="index">{{ detail }}</li>
-        </ul>
-        <span>Available colors:</span>
-        <div
-          v-for="(variant, index) in variants"
-          :key="variant.variantId"
-          class="color-box"
-          :style="{ backgroundColor: variant.variantColor }"
-          @mouseover="updateProduct(index)"
-        ></div>
-        <span>Available in sizes:</span>
-        <ul>
-          <li v-for="(size, index) in sizes" :key="index">{{ size }}</li>
-        </ul>
-        <div>
-          <button
-            @click="addToCart"
-            :disabled="!inStock"
-            :class="{ disabledButton: !inStock }"
-          >
-            Add to Cart
-          </button>
-          <button @click="removeFromCart">Remove From Cart</button>
-          <div class="cart">
-            <p>Cart({{ cart }})</p>
-          </div>
-        </div>
-      </div>
+    <div class="cart">
+      <p>Cart({{ cart.length }})</p>
     </div>
+    <Header />
+    <Product
+      :premium="premium"
+      @add-to-cart="updateCart"
+      @remove-from-cart="refreshCart"
+    />
+    <Product
+      :premium="premium"
+      @add-to-cart="updateCart"
+      @remove-from-cart="refreshCart"
+    />
+    <Product
+      :premium="premium"
+      @add-to-cart="updateCart"
+      @remove-from-cart="refreshCart"
+    />
   </div>
 </template>
-
 <script>
+import Header from "./components/Header";
+import Product from "./components/Product";
 export default {
   name: "App",
-  components: {},
   data: function() {
-    // note the way the URLs are handled...if you're pointing to an internal asset, you need a require just as in
-    // if you're pointing to an external URL, you can't have the require...has to do with how webpack
-    // handles these URLs and only matters in a vue file (not an HTML and js combo)
     return {
-      brand: "Vue Mastery",
-      product: "Socks",
-      selectedVariant: 0,
-      vendor: "https://www.nordstrom.com",
-      details: ["80% cotton", "20% polyester", "Gender-neutral"],
-      variants: [
-        {
-          variantId: 2234,
-          variantColor: "green",
-          variantImage: require("./assets/vmSocks-green-onWhite.jpg"),
-          variantQuantity: 22,
-          variantSale: true,
-        },
-        {
-          variantId: 2235,
-          variantColor: "blue",
-          variantImage: require("./assets/vmSocks-blue-onWhite.jpg"),
-          variantQuantity: 0,
-          variantSale: false,
-        },
-      ],
-      sizes: ["s", "m", "l", "xl", "xxl"],
-      cart: 0,
+      premium: false,
+      cart: [],
     };
   },
-  methods: {
-    addToCart: function() {
-      this.cart++;
-    },
-    removeFromCart: function() {
-      this.cart--;
-    },
-    updateProduct: function(index) {
-      this.selectedVariant = index;
-      console.log(index);
-    },
+  components: {
+    Header,
+    Product,
   },
-  computed: {
-    productTitle() {
-      return this.brand + " " + this.product;
+  methods: {
+    updateCart: function(id) {
+      this.cart.push(id);
     },
-    image() {
-      return this.variants[this.selectedVariant].variantImage;
-    },
-    inStock() {
-      return this.variants[this.selectedVariant].variantQuantity;
-    },
-    onSale() {
-      return this.variants[this.selectedVariant].variantSale;
+    refreshCart: function(id) {
+      for (var i = this.cart.length - 1; i >= 0; i--) {
+        if (this.cart[i] === id) {
+          this.cart.splice(i, 1);
+        }
+      }
     },
   },
 };
@@ -115,99 +58,11 @@ body {
   margin: 0px;
 }
 
-.nav-bar {
-  background: linear-gradient(-90deg, #84cf6a, #16c0b0);
-  height: 60px;
-  margin-bottom: 15px;
-}
-
-.product {
-  display: flex;
-  flex-flow: wrap;
-  padding: 1rem;
-}
-
-img {
-  border: 1px solid #d8d8d8;
-  width: 70%;
-  margin: 40px;
-  box-shadow: 0px 0.5px 1px #d8d8d8;
-}
-
-.product-image {
-  width: 80%;
-}
-
-.product-vendor {
-  padding-top: 1px;
-}
-
-.product-image,
-.product-info {
-  margin-top: 10px;
-  width: 50%;
-}
-
-h1 {
-  margin-bottom: 2px;
-}
-
-.color-box {
-  width: 40px;
-  height: 40px;
-  margin-top: 5px;
-}
-
 .cart {
+  color: #ffffff;
   margin-right: 25px;
   float: right;
-  border: 1px solid #d8d8d8;
+  border: 1px solid #ffffff;
   padding: 5px 20px;
-}
-
-button {
-  margin-top: 30px;
-  border: none;
-  background-color: #1e95ea;
-  color: white;
-  height: 40px;
-  width: 100px;
-  font-size: 14px;
-}
-
-.disabledButton {
-  background-color: #d8d8d8;
-}
-
-.outStockLabel {
-  text-decoration: line-through;
-}
-
-.review-form {
-  width: 400px;
-  padding: 20px;
-  margin: 40px;
-  border: 1px solid #d8d8d8;
-}
-
-input {
-  width: 100%;
-  height: 25px;
-  margin-bottom: 20px;
-}
-
-textarea {
-  width: 100%;
-  height: 60px;
-}
-
-.tab {
-  margin-left: 20px;
-  cursor: pointer;
-}
-
-.activeTab {
-  color: #16c0b0;
-  text-decoration: underline;
 }
 </style>
