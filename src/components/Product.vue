@@ -10,11 +10,10 @@
         <p v-if="inStock">In Stock</p>
         <p v-else :class="{ outStockLabel: !inStock }">Out of Stock</p>
         <p v-if="onSale">On Sale!</p>
-        <p>Shipping: {{ shipping }}</p>
-        <p>User is premium: {{ premium }}</p>
+        <Shipping :shipping="shipping" />
         <span>Product details:</span>
         <ProductDetails :details="details"></ProductDetails>
-        <span>Available colors:</span>
+        <p>Available colors:</p>
         <div
           v-for="(variant, index) in variants"
           :key="variant.variantId"
@@ -28,9 +27,6 @@
             {{ size }}
           </span>
         </p>
-        <!-- <ul>
-          <li v-for="(size, index) in sizes" :key="index">{{ size }}</li>
-        </ul> -->
         <div class="cart-buttons">
           <button
             @click="addToCart"
@@ -43,19 +39,7 @@
             Remove from Cart
           </button>
         </div>
-        <div>
-          <h2>Reviews</h2>
-          <p v-if="!reviews.length">There are no reviews yet.</p>
-          <ul>
-            <li v-for="(review, index) in reviews" :key="index">
-              <p>{{ review.name }}</p>
-              <p>Rating: {{ review.rating }}</p>
-              <p>{{ review.review }}</p>
-              <p>Recommended? {{ review.recommend }}</p>
-            </li>
-          </ul>
-        </div>
-        <ProductReview @review-submitted="addReview" />
+        <ProductTabs />
       </div>
     </div>
   </div>
@@ -63,19 +47,17 @@
 
 <script>
 import ProductDetails from "./ProductDetails";
-import ProductReview from "./ProductReview";
+import ProductTabs from "./ProductTabs";
+import Shipping from "./Shipping";
+
 export default {
   name: "Product",
   components: {
     ProductDetails,
-    ProductReview,
+    ProductTabs,
+    Shipping,
   },
-  props: {
-    premium: {
-      type: Boolean,
-      required: true,
-    },
-  },
+
   data: function() {
     // note the way the URLs are handled...if you're pointing to an internal asset, you need a require just as in
     // if you're pointing to an external URL, you can't have the require...has to do with how webpack
@@ -103,8 +85,13 @@ export default {
       ],
       sizes: ["s", "m", "l", "xl", "xxl"],
       details: ["80% Cotton", "20% Polyester", "Gender-neutral"],
-      reviews: [],
     };
+  },
+  props: {
+    premium: {
+      type: Boolean,
+      required: true,
+    },
   },
   methods: {
     addToCart: function() {
@@ -119,9 +106,6 @@ export default {
     updateProduct: function(index) {
       this.selectedVariant = index;
       console.log(index);
-    },
-    addReview: function(productReview) {
-      this.reviews.push(productReview);
     },
   },
   computed: {
@@ -138,7 +122,7 @@ export default {
       return this.variants[this.selectedVariant].variantSale;
     },
     shipping() {
-      return this.premium ? "Free" : 2.99;
+      return this.premium ? "Free" : "$" + 2.99;
     },
   },
 };
@@ -181,8 +165,10 @@ h1 {
 }
 
 .color-box {
+  display: inline-block;
   width: 40px;
   height: 40px;
+  margin-right: 5px;
   margin-top: 5px;
 }
 
@@ -191,14 +177,15 @@ h1 {
 }
 
 button {
-  margin-top: 30px;
+  margin-top: 5px;
   border: none;
   background-color: #1e95ea;
   color: white;
   height: 40px;
   width: 100px;
   font-size: 14px;
-  margin: 4px;
+  margin-right: 5px;
+  margin-bottom: 15px;
 }
 
 .disabledButton {
@@ -207,15 +194,5 @@ button {
 
 .outStockLabel {
   text-decoration: line-through;
-}
-
-.tab {
-  margin-left: 20px;
-  cursor: pointer;
-}
-
-.activeTab {
-  color: #16c0b0;
-  text-decoration: underline;
 }
 </style>

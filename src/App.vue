@@ -1,39 +1,29 @@
 <template>
   <div id="app">
-    <div class="cart">
-      <p>Cart({{ cart.length }})</p>
+    <div class="header">
+      <div class="premium" v-bind:class="{ hidden: !premium }">
+        YOU HAVE PREMIUM STATUS
+      </div>
+      <div class="cart">Cart({{ cart.length }})</div>
     </div>
-    <Header />
     <Product
-      :premium="premium"
       @add-to-cart="updateCart"
       @remove-from-cart="refreshCart"
-    />
-    <Product
       :premium="premium"
-      @add-to-cart="updateCart"
-      @remove-from-cart="refreshCart"
-    />
-    <Product
-      :premium="premium"
-      @add-to-cart="updateCart"
-      @remove-from-cart="refreshCart"
     />
   </div>
 </template>
 <script>
-import Header from "./components/Header";
 import Product from "./components/Product";
 export default {
   name: "App",
   data: function() {
     return {
-      premium: false,
+      premium: true,
       cart: [],
     };
   },
   components: {
-    Header,
     Product,
   },
   methods: {
@@ -58,11 +48,30 @@ body {
   margin: 0px;
 }
 
+.header {
+  background: linear-gradient(-90deg, #84cf6a, #16c0b0);
+  height: 60px;
+  margin-bottom: 15px;
+  padding-top: 25px;
+}
+
 .cart {
   color: #ffffff;
-  margin-right: 25px;
+  margin-right: 15px;
   float: right;
   border: 1px solid #ffffff;
   padding: 5px 20px;
+}
+
+.premium {
+  color: #ffffff;
+  margin-right: 15px;
+  border: 1px solid #ffffff;
+  padding: 5px 20px;
+  float: right;
+}
+
+.hidden {
+  display: none;
 }
 </style>
